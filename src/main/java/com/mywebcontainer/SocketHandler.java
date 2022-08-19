@@ -1,5 +1,6 @@
 package com.mywebcontainer;
 
+import com.myservlets.HttpRequest;
 import com.myservlets.HttpServlet;
 
 import java.io.BufferedReader;
@@ -26,23 +27,35 @@ public class SocketHandler extends Thread {
         PrintWriter writer;
         try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String line = reader.readLine();
-
-            while (!line.isEmpty()) {
-                System.out.println(line);
-                line = reader.readLine();
-            }
-
             writer = new PrintWriter(socket.getOutputStream());
-            writer.println("HTTP/1.1 200 OK :)");
+            HttpRequest httpRequest = new HttpRequest(reader);
+            if (!httpRequest.parse()) {
+                writer.println("HTTP/1.1 500 Internal Server error");
+                writer.println("Content-Type: text/plain");
+                writer.println();
+                writer.println("<html><body>Cannot process your request</body></html>");
+                writer.flush();
+            }
+            System.out.println("====================================================");
+            System.out.println("method:" + httpRequest.getMethod());
+            System.out.println("====================================================");
+            System.out.println("path:" + httpRequest.getPath());
+            System.out.println("====================================================");
+            httpRequest.getRequestParameters().forEach((paramName, paramValue) -> System.out.println(paramName + ":" + paramValue));
+            System.out.println("====================================================");
+            httpRequest.getHeaders().forEach((headerName, headerValue) -> System.out.println(headerName + ":" + headerValue));
+            System.out.println("====================================================");
+
+
+            writer.println("Http/1.1 200 0k :)");
             writer.println("Content-Type: text/html");
             writer.println();
-            writer.println("<html><body>Current Time:");
+            writer.println("<html><body> Current time");
             writer.println(LocalDateTime.now());
             writer.println("</body></html>");
             writer.flush();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         } finally {
             try {
                 socket.close();

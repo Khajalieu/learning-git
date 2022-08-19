@@ -65,11 +65,14 @@ public class SimpleWebContainer {
     public static void main(String[] args) throws IOException {
         SimpleWebContainer simpleWebContainer = new SimpleWebContainer(8888, "config.properties");
         simpleWebContainer.loadProperties();
-        simpleWebContainer.handlers.forEach((url, httpServlet) -> {
-            System.out.println(url);
-            httpServlet.doPost();
-        });
         simpleWebContainer.start();
+
+
+
+        //        simpleWebContainer.handlers.forEach((url, httpServlet) -> {
+//            System.out.println(url);
+//            httpServlet.doPost();
+//        });
 
     }
 
